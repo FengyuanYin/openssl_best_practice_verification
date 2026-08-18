@@ -1,0 +1,4 @@
+interface:
+  display_name: "OpenSSF Structure Auditor"
+  short_description: "Generate and audit OpenSSF badge structure files"
+  default_prompt: "Use $openssf-structure-auditor to generate structure.md from an OpenSSF project page and verify each criterion against its source repository."
