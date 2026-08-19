@@ -34,6 +34,7 @@ The DCO is the recommended mechanism because it's easy to implement, tracked in 
  项目必须明确采用 DCO 作为法律机制, 需要解释 “Signed-off-by” 的含义, 标准针对的是 “non-trivial amounts of project software”，即非少量代码贡献。项目可以规定所有提交都必须签署，也可以只对达到一定规模的贡献要求签署。这一点最好在项目文档中说明清楚。 如果项目：1.在 README、CONTRIBUTING 或治理文档中明确说明采用 DCO,2.提供了 DCO 链接或说明, 3.要求贡献者使用 git commit -s 或手动添加 Signed-off-by；并解释了签署的法律含义；那么就可以认为已经达到了该要求。
 
 [dependancy]: Karmada 当前的 CONTRIBUTING.md 没有采用 DCO、链接 Developer Certificate of Origin 或要求贡献者使用 `git commit -s`/`Signed-off-by`，因此不能填 Met。https://github.com/karmada-io/karmada/blob/master/CONTRIBUTING.md
+[improvement]: 在 CONTRIBUTING.md 与 PR 模板中明确采用 DCO，链接 Developer Certificate of Origin，要求提交使用 `git commit -s` 添加 Signed-off-by，并解释其法律含义。
 
 
 ### [Met] [MUST]
@@ -76,6 +77,7 @@ The project might not achieve the roadmap, and that's fine; the purpose of the r
 项目必须有一份公开的、书面化的路线图（roadmap），用来说明项目在未来至少一年内打算做什么、不打算做什么。
 
 [dependancy]: Karmada 已公开 ROADMAP.md，但当前内容是“2026 feature plan”。以 2026-08-18 为核验时间，它没有覆盖之后至少完整一年的计划，而且 Pending 列表不能替代带时间范围的未来一年路线图，因此当前不能填 Met。https://github.com/karmada-io/community/blob/main/ROADMAP.md
+[improvement]: 将 community/ROADMAP.md 更新为覆盖审计日后至少一整年、带明确时间范围的计划，并写明不打算做的范围。
 
 
 ### [Met] [MUST]
@@ -92,6 +94,7 @@ These are the security requirements that the software is intended to meet.
 项目产出软件，就必须公开文档化该软件的安全需求，明确说明用户在使用该软件时可以期待哪些安全保障，不能期待哪些安全保障。
 
 [dependancy]: Karmada 的 Security Self-Assessment 已列出若干 Security Goals 和安全功能，但其中 Non-goals 章节为空，没有完整说明用户不能期待的安全保证；现有 Security Considerations 主要是部署建议，尚不能完全替代明确的 security requirements 与边界说明。https://github.com/karmada-io/community/blob/main/security-team/assessments/self-assessment.md ; https://karmada.io/docs/administrator/security/security-considerations/
+[improvement]: 补全 security-team/assessments/self-assessment.md 的 Non-goals，并新增明确的 security requirements 文档，说明用户能与不能期待的保证。
 
 ### [Met] [MUST]
 The project MUST provide a "quick start" guide for new users to help them quickly do something with the software. (URL required) [documentation_quick_start] 
@@ -113,6 +116,7 @@ An achievement is any set of external criteria that the project has specifically
 项目一旦获得某项公开认可（尤其是徽章），必须在两天内把该成就的标识和链接放到仓库首页或网站上，让访问者可以看到并点击验证。
 
 [dependancy]: Karmada 已获得 OpenSSF Best Practices Passing，但主仓库 README 当前展示 OpenSSF Scorecard、Codecov 等徽章，没有展示并链接项目 #5301 的 OpenSSF Best Practices badge，因此当前不能填 Met。https://github.com/karmada-io/karmada/blob/master/README.md ; https://www.bestpractices.dev/en/projects/5301
+[improvement]: 在仓库 README 或官网首页增加并超链接 OpenSSF Best Practices badge（项目 #5301）。
 
 # Accessibility and internationalization
 
@@ -132,6 +136,7 @@ Localization "refers to the adaptation of a product, application or document con
 目产出的软件应当进行国际化（i18n），以便后续能轻松地针对不同文化、地区或语言进行本地化。这是一个推荐性要求（SHOULD），而不是强制性的“MUST”。
 
 [dependancy]: Karmada 官网文档已有中文等本地化内容，但 Karmada 核心软件和 karmadactl 面向用户输出的文本没有公开、系统化的 i18n/localization 框架或资源目录，因此“软件 produced by the project 已国际化”尚不能填 Met。https://github.com/karmada-io/karmada ; https://karmada.io/zh/docs/
+[improvement]: 为 karmadactl 与核心面向用户输出建立系统化 i18n/本地化框架和资源目录，覆盖全部面向用户文本。
 
 ### [N/A] [MUST]
 If the project sites (website, repository, and download URLs) store passwords for authentication of external users, the passwords MUST be stored as iterated hashes with a per-user salt by using a key stretching (iterated) algorithm (e.g., Argon2id, Bcrypt, Scrypt, or PBKDF2). If the project sites do not store passwords for this purpose, select "not applicable" (N/A). [sites_password_security] 
@@ -273,6 +278,7 @@ The project MUST be able to repeat the process of generating information from so
 修复时可以让 `buildDate` 来自固定的 `SOURCE_DATE_EPOCH` 或 commit 时间，为 `go build` 使用稳定的 `-trimpath`/build-id 策略，并固定 tar 文件顺序、mtime、owner、group 与 gzip 时间戳。最后应在两个干净目录中构建同一 commit 并比较 SHA-256，把该验证加入 CI。
 
 [dependancy]: https://github.com/karmada-io/karmada/blob/master/hack/util.sh ; https://github.com/karmada-io/karmada/blob/master/hack/release.sh
+[improvement]: 让 buildDate 来自固定的 SOURCE_DATE_EPOCH 或 commit 时间，为 `go build` 使用 `-trimpath`/稳定 build-id，固定 tar/gzip 元数据，并在 CI 中对同一 commit 做两次构建的 SHA-256 对比。
 
 ## Installation system
 
@@ -351,6 +357,7 @@ Go 自带 FLOSS 覆盖率工具，Karmada 的 `Makefile` 已对 `pkg`、`cmd`、
 修复时应优先补齐安全关键和核心控制器路径的测试，把项目 statement coverage 提升到至少 80%，并在 Codecov 中设置 project coverage required check。达到阈值后，需要用公开的 master commit 覆盖率报告作为依据再改为 `Met`。
 
 [dependancy]: https://codecov.io/gh/karmada-io/karmada ; https://github.com/karmada-io/karmada/blob/master/Makefile ; https://github.com/karmada-io/karmada/blob/master/.github/workflows/ci.yml ; https://github.com/karmada-io/karmada/blob/master/.codecov.yml
+[improvement]: 优先补齐安全关键与核心控制器路径的测试，将语句覆盖率提升到至少 80%，并在 Codecov 设置 project coverage required check；达到阈值后以公开的 master commit 覆盖报告作为依据。
 
 ## New functionality testing
 
@@ -464,6 +471,7 @@ It is SUGGESTED that each important version tag in the version control system be
 该项是 SUGGESTED，不会像 MUST 一样直接阻止 Silver，但必须明确填写。建议后续发布流程创建签名 annotated tags，并在发布文档中说明如何使用 `git tag -v` 或对应 Sigstore/SSH 方法验证。
 
 [dependancy]: https://github.com/karmada-io/karmada/releases/tag/v1.18.2 ; https://github.com/karmada-io/karmada/tags
+[improvement]: 在发布流程中为重要版本创建签名的 annotated tag（GPG/SSH/Sigstore），并在发布文档中提供 `git tag -v` 或对应验证说明。
 
 ## Other security issues
 
@@ -491,6 +499,7 @@ Karmada 已发布 CNCF Security Self-Assessment、组件架构、安全目标、
 建议在 `community/security-team/assessments/` 新增 `assurance-case.md`，至少包含：威胁参与者和能力、Push/Pull 模式数据流、控制面/成员集群/发布流水线的信任边界、Saltzer and Schroeder 等安全原则映射、OWASP/CWE 常见弱点映射、每个控制的代码/配置/测试证据、剩余风险和适用版本。完成并经 security team/maintainer review 后，再以该公开 URL 填 `Met`。
 
 [dependancy]: https://github.com/karmada-io/community/blob/main/security-team/assessments/self-assessment.md ; https://github.com/karmada-io/community/blob/main/security-team/assessments/OSTIF-Karmada-Report.pdf ; https://github.com/karmada-io/community/tree/main/security-team
+[improvement]: 在 community/security-team/assessments/ 新增 assurance-case.md，包含威胁模型、明确信任边界、安全设计原则与 OWASP/CWE 常见弱点映射及每项控制的证据，经评审后以公开 URL 作为依据。
 
 # Analysis
 

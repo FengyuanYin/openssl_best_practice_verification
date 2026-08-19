@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate structure.md status headings and dependency evidence rules."""
+"""Validate structure.md status headings, dependency evidence, and Unmet improvement guidance."""
 
 from __future__ import annotations
 
@@ -18,6 +18,7 @@ STATUS_RE = re.compile(
 )
 HEADING_RE = re.compile(r"^#{1,3} ")
 DEPENDENCY_RE = re.compile(r"^\[dependancy\]:\s*(?P<value>.*)$", re.IGNORECASE)
+IMPROVEMENT_RE = re.compile(r"^\[improvement\]:\s*(?P<value>.*)$", re.IGNORECASE)
 CRITERION_ID_RE = re.compile(r"\[([a-z][a-z0-9_]*)\]")
 
 
@@ -35,6 +36,7 @@ class Report:
     decided: int
     unknown: int
     dependencies: int
+    improvements: int
     findings: list[Finding]
 
     @property
@@ -56,7 +58,7 @@ def _block_end(lines: list[str], start: int) -> int:
 def validate(path: Path) -> Report:
     lines = path.read_text(encoding="utf-8").splitlines()
     findings: list[Finding] = []
-    criteria = decided = unknown = dependencies = 0
+    criteria = decided = unknown = dependencies = improvements = 0
     seen_ids: dict[str, int] = {}
     for index, line in enumerate(lines):
         if not line.startswith("### ["):
@@ -83,6 +85,9 @@ def validate(path: Path) -> Report:
         dep_lines = [DEPENDENCY_RE.match(item) for item in block]
         dep_matches = [item for item in dep_lines if item is not None]
         dependencies += len(dep_matches)
+        imp_lines = [IMPROVEMENT_RE.match(item) for item in block]
+        imp_matches = [item for item in imp_lines if item is not None]
+        improvements += len(imp_matches)
         if status == "?":
             unknown += 1
         else:
@@ -99,12 +104,25 @@ def validate(path: Path) -> Report:
                 findings.append(
                     Finding("error", index + 1, "Dependency evidence is empty")
                 )
+        if status == "Unmet":
+            if not imp_matches:
+                findings.append(
+                    Finding(
+                        "error",
+                        index + 1,
+                        "Unmet criterion is missing an [improvement]: line",
+                    )
+                )
+            elif not imp_matches[-1].group("value").strip():
+                findings.append(
+                    Finding("error", index + 1, "Improvement guidance is empty")
+                )
         ids = []
         for item in block:
             ids.extend(
                 value
                 for value in CRITERION_ID_RE.findall(item)
-                if value != "dependancy"
+                if value not in {"dependancy", "improvement"}
             )
         if not ids:
             findings.append(
@@ -129,6 +147,7 @@ def validate(path: Path) -> Report:
         decided=decided,
         unknown=unknown,
         dependencies=dependencies,
+        improvements=improvements,
         findings=findings,
     )
 
@@ -148,7 +167,8 @@ def main() -> int:
         print(
             f"criteria={report.criteria} decided={report.decided} "
             f"unknown={report.unknown} dependencies={report.dependencies} "
-            f"errors={report.errors} warnings={report.warnings}"
+            f"improvements={report.improvements} errors={report.errors} "
+            f"warnings={report.warnings}"
         )
         for finding in report.findings:
             print(

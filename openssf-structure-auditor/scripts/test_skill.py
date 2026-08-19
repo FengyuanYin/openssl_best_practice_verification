@@ -70,6 +70,40 @@ class SkillTests(unittest.TestCase):
             report = validate_structure.validate(target)
             self.assertGreater(report.errors, 0)
 
+    def test_unmet_requires_improvement_line(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "structure.md"
+            target.write_text(
+                "### [Unmet] [MUST]\n"
+                "A project MUST do a thing. [thing]\n"
+                "[dependancy]: evidence\n",
+                encoding="utf-8",
+            )
+            report = validate_structure.validate(target)
+            self.assertGreater(report.errors, 0)
+            self.assertTrue(
+                any(
+                    "improvement" in finding.message.lower()
+                    for finding in report.findings
+                )
+            )
+
+    def test_unmet_with_improvement_line_passes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "structure.md"
+            target.write_text(
+                "### [Unmet] [MUST]\n"
+                "A project MUST do a thing. [thing]\n"
+                "[dependancy]: evidence\n"
+                "[improvement]: add the thing to file X\n",
+                encoding="utf-8",
+            )
+            report = validate_structure.validate(target)
+            self.assertEqual(
+                [], [f for f in report.findings if f.severity == "error"]
+            )
+            self.assertEqual(1, report.improvements)
+
     def test_truth_self_evaluation(self):
         truth = SKILL_DIR / "assets" / "structure-template.md"
         metrics = evaluate_against_truth.evaluate(truth, truth)

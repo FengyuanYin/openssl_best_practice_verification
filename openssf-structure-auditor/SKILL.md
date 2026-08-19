@@ -77,10 +77,16 @@ For each `[?]`:
 [dependancy]: <concise reasoning plus direct URLs or repository paths>
 ```
 
-6. For negative conclusions, cite the canonical location and state what required element is absent.
-7. For time-window criteria, include the cutoff date and request maintainer confirmation of private records.
+6. For `[Unmet]` criteria, append the final line of the criterion block after the dependency line:
 
-Do not add `[dependancy]` to unresolved `[?]`. Do not mark an item Met merely because the OpenSSF page selected Met. Use `apply_patch` for controlled edits and reread each edited section.
+```text
+[improvement]: <concrete next steps plus the canonical file/path to change>
+```
+
+7. For negative conclusions, cite the canonical location and state what required element is absent.
+8. For time-window criteria, include the cutoff date and request maintainer confirmation of private records.
+
+Do not add `[dependancy]` to unresolved `[?]`, and do not add `[improvement]` to `Met`, `N/A`, or unresolved criteria. Do not mark an item Met merely because the OpenSSF page selected Met. Use `apply_patch` for controlled edits and reread each edited section.
 
 ## Step 5: Validate rules and preservation
 
@@ -90,7 +96,7 @@ Run:
 python <skill-dir>\scripts\validate_structure.py "<target>\structure.md"
 ```
 
-Fix all errors. Warnings for missing machine-readable criterion ids can remain when the user's original text omitted an id.
+Fix all errors, including every `Unmet` criterion missing a non-empty `[improvement]:` line. Warnings for missing machine-readable criterion ids can remain when the user's original text omitted an id.
 
 When a truth document is available, evaluate it:
 
@@ -102,12 +108,24 @@ python <skill-dir>\scripts\evaluate_against_truth.py `
 
 For a freshly generated all-unknown skeleton, add `--skeleton`. Confirm generation against an existing path fails without changing its hash. For an in-place audit, review the diff and confirm existing prose changed only where authorized.
 
-## Step 6: Decide completion
+## Step 6: Generate per-status detail documents
+
+After `structure.md` is validated, produce one detail document per non-Met status next to the audit summary, using the status tokens exactly as decided:
+
+- `unmet.md` — every `[Unmet]` criterion: why it fails, the concrete path to `Met`, and the files to change.
+- `na.md` — every `[N/A]` criterion: why the official trigger does not apply and the evidence that it is absent.
+- `unknown.md` — every `[?]` criterion: the missing evidence and the next verification step.
+
+For every entry record the criterion id, MUST/SHOULD level, a plain-language summary of the requirement, the involved files, and the same evidence as the corresponding `structure.md` block. Keep the per-status counts and MUST/SHOULD split identical to `structure.md` and the audit summary; these documents summarize decisions and must not add new ones. Follow `references/audit-rules.md` for per-status content.
+
+## Step 7: Decide completion
 
 Complete a run only when:
 
 - Validator errors are `0`.
 - Dependency coverage for decided criteria is `100%`.
+- Improvement guidance is present for `100%` of `Unmet` criteria.
+- Per-status detail documents (`unmet.md`, `na.md`, `unknown.md`) cover `100%` of non-Met criteria and match `structure.md` statuses.
 - Existing-file preservation is `100%`.
 - Structural recall against supplied truth is at least `95%`.
 - Decision recall against supplied truth is at least `80%` of truth-decided entries.
@@ -118,8 +136,9 @@ Unknown entries are acceptable only when the fact requires private state, an emp
 ## Resources
 
 - `scripts/fetch_structure.py`: fetch and parse criteria; refuse overwrite by default.
-- `scripts/validate_structure.py`: enforce status and evidence rules.
+- `scripts/validate_structure.py`: enforce status, dependency, and `Unmet` improvement rules.
 - `scripts/evaluate_against_truth.py`: calculate completion metrics.
 - `scripts/test_skill.py`: deterministic regression tests.
 - `references/audit-rules.md`: evidence hierarchy and difficult decisions.
 - `assets/structure-template.md`: immutable style/truth fixture.
+- Per-status detail documents: `unmet.md` (improvement paths), `na.md` (N/A reasons), `unknown.md` (missing evidence and next steps).
